@@ -56,6 +56,10 @@ VERIFIED_OFFICIAL_URLS = {
     "databridge agent": "https://help.aliyun.com/zh/dts/user-guide/what-is-databridge-agent",
     "腾讯ai双引擎防沉迷": "https://jiazhang.qq.com/",
     "liblib ai": "https://www.liblib.art/",
+    "revor ai": "https://revor.ai/",
+    "acx": "https://laiye.com/product/acx-intro",
+    "浩辰ai识图": "https://www.gstarcad.com/",
+    "gstarrender": "https://www.gstarcad.com/ai/render/",
 }
 
 

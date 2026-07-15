@@ -382,7 +382,7 @@
       "slug": "revor-ai",
       "category": "AI营销自动化",
       "summary": "全流程智能营销与客户挖掘工具，实现从线索挖掘到客户触达的自动化。",
-      "official_url": "https://news.zol.com.cn/1204/12044140.html",
+      "official_url": "https://revor.ai/",
       "launch_date": "待验证",
       "tags": [
         "AI营销",
@@ -427,7 +427,7 @@
         "user_feedback": "暂无可核实反馈"
       },
       "score": 66,
-      "official_link_label": "查看产品发布页",
+      "official_link_label": "访问产品官网",
       "id": "revor-ai",
       "sources": [
         {
@@ -442,7 +442,7 @@
       "slug": "acx",
       "category": "智能体客户体验平台",
       "summary": "来也科技推出的智能体客户体验平台，支持多渠道接入，零代码搭建，提供对外客户服务和对内员工服务。",
-      "official_url": "https://www.acx.com/",
+      "official_url": "https://laiye.com/product/acx-intro",
       "launch_date": "待验证",
       "tags": [
         "AI Agent",
@@ -499,7 +499,7 @@
       "slug": "haochen-ai-image-recognition",
       "category": "AI+CAD",
       "summary": "浩辰软件推出的AI识图产品，核心功能为AI图片转CAD，一键将图纸转为可编辑矢量文件。",
-      "official_url": "https://finance.cnr.cn/cjgs/20260616/t20260616_527663599.shtml",
+      "official_url": "https://www.gstarcad.com/",
       "launch_date": "2026-06-16",
       "tags": [
         "AI识图",
@@ -538,7 +538,7 @@
         "user_feedback": "暂无可核实反馈"
       },
       "score": 62,
-      "official_link_label": "查看产品发布页",
+      "official_link_label": "访问产品官网",
       "id": "haochen-ai-image-recognition",
       "sources": [
         {
@@ -553,7 +553,7 @@
       "slug": "gstarrender",
       "category": "AI渲染",
       "summary": "浩辰软件推出的专业AI渲染产品，具备300万+专业数据训练的专用模型和6500+设计模板，支持灵感生成、方案迭代、高清渲染和动态视频生成。",
-      "official_url": "https://finance.cnr.cn/cjgs/20260616/t20260616_527663599.shtml",
+      "official_url": "https://www.gstarcad.com/ai/render/",
       "launch_date": "2026-06-16",
       "tags": [
         "AI渲染",
@@ -595,7 +595,7 @@
         "user_feedback": "暂无可核实反馈"
       },
       "score": 60,
-      "official_link_label": "查看产品发布页",
+      "official_link_label": "访问产品官网",
       "id": "gstarrender",
       "sources": [
         {
