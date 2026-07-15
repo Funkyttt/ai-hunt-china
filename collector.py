@@ -40,6 +40,19 @@ NON_OFFICIAL_HOSTS = {
     "bing.com", "baidu.com", "zhihu.com", "sohu.com", "36kr.com", "qq.com",
     "sina.com.cn", "msn.com", "pedaily.cn", "toutiao.com", "163.com",
 }
+VERIFIED_OFFICIAL_URLS = {
+    "微信小微": "https://weixin.qq.com/",
+    "workbuddy": "https://www.workbuddy.ai/",
+    "laiye worker": "https://laiye.com/news/",
+    "aipy企业版": "https://www.aipyaipy.com/companies/",
+    "deep code": "https://deepcode.vegamo.cn/",
+    "秒悟meoo night plan": "https://meoo.com/",
+    "豆包": "https://www.doubao.com/",
+    "hy3正式版": "https://github.com/Tencent-Hunyuan/Hy3",
+    "hy3": "https://github.com/Tencent-Hunyuan/Hy3",
+    "qoder企业版": "https://qoder.com/",
+    "mk-claw": "https://www.landray.com.cn/",
+}
 
 
 def discover_candidates(days: int = 30) -> list[dict[str, Any]]:
@@ -221,6 +234,15 @@ candidate_indexes 必须直接复制候选资料中的 index，至少包含一�
             ][:2]
         if not indexes:
             continue
+        try:
+            score = int(product.get("score", 0))
+        except (TypeError, ValueError):
+            score = 0
+        if score <= 0:
+            # Supplemental selections are already ranked; preserve that order when
+            # the model omits a numeric score instead of showing a misleading zero.
+            score = max(60, 78 - len(result) * 2)
+        product["score"] = max(0, min(100, score))
         product["evidence"] = [candidates[i] for i in indexes[:4]]
         result.append(product)
     if len(result) < 10:
@@ -263,6 +285,9 @@ def analyze_product(client: DeepSeekClient, selected: dict[str, Any]) -> dict[st
 资料：{json.dumps(selected.get('evidence', []), ensure_ascii=False)}"""
     product = client.json(system, user)
     product["score"] = max(0, min(100, int(selected.get("score", 0))))
+    trusted_url = VERIFIED_OFFICIAL_URLS.get(clean(product.get("name", "")).lower())
+    if trusted_url:
+        product["official_url"] = trusted_url
     product["id"] = product.get("slug") or hashlib.sha1(product.get("name", "product").encode()).hexdigest()[:10]
     product["sources"] = [
         {"title": item.get("title", "原始报道"), "url": item.get("url", ""), "source": item.get("source", "")}

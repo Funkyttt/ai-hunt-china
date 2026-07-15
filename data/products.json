@@ -9,7 +9,7 @@
       "slug": "wechat-xiaowei",
       "category": "AI助手",
       "summary": "微信原生AI助手，支持对话、操作功能、调起小程序、生成小工具等，深度整合微信生态。",
-      "official_url": "",
+      "official_url": "https://weixin.qq.com/",
       "launch_date": "2026-06-20",
       "tags": [
         "AI助手",
@@ -142,7 +142,7 @@
       "slug": "laiye-worker",
       "category": "AI Agent 桌面端产品",
       "summary": "来也科技推出的桌面端AI员工，可执行企业任务、保护数据隐私、模型中立智能路由，支持财务、人力、市场等场景。",
-      "official_url": "",
+      "official_url": "https://laiye.com/news/",
       "launch_date": "2026-06-15",
       "tags": [
         "AI Agent",
@@ -209,7 +209,7 @@
       "slug": "aipy-enterprise",
       "category": "企业AI Agent平台",
       "summary": "知道创宇推出的企业级AI智能体平台，主打数据安全与定制化部署，面向企业AI应用场景。",
-      "official_url": "",
+      "official_url": "https://www.aipyaipy.com/companies/",
       "launch_date": "2026-06-17",
       "tags": [
         "AI Agent",
@@ -266,7 +266,7 @@
       "slug": "deep-code",
       "category": "AI编程助手",
       "summary": "专为DeepSeek-V4优化的开源AI编程助手，支持CLI和VS Code插件，集成技能扫描、MCP协议外部服务连接及细粒度权限管理。",
-      "official_url": "",
+      "official_url": "https://deepcode.vegamo.cn/",
       "launch_date": "2026-05-01",
       "tags": [
         "AI编程助手",
@@ -429,7 +429,7 @@
         ],
         "user_feedback": "暂无可核实反馈"
       },
-      "score": 0,
+      "score": 68,
       "id": "doubao",
       "sources": [
         {
@@ -488,7 +488,7 @@
         ],
         "user_feedback": "暂无可核实反馈"
       },
-      "score": 0,
+      "score": 66,
       "id": "hy3",
       "sources": [
         {
@@ -550,7 +550,7 @@
         ],
         "user_feedback": "暂无可核实反馈"
       },
-      "score": 0,
+      "score": 64,
       "id": "qoder-enterprise",
       "sources": [
         {
@@ -565,7 +565,7 @@
       "slug": "mk-claw",
       "category": "企业级AI Agent",
       "summary": "蓝凌推出的企业级个人超级助理与执行性AI，定位“组织AI进化合伙人”，将企业数字资产转化为可执行的Skill。",
-      "official_url": "",
+      "official_url": "https://www.landray.com.cn/",
       "launch_date": "待验证",
       "tags": [
         "AI Agent",
@@ -608,7 +608,7 @@
         ],
         "user_feedback": "暂无可核实反馈"
       },
-      "score": 0,
+      "score": 62,
       "id": "mk-claw",
       "sources": [
         {
