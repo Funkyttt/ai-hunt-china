@@ -1,0 +1,188 @@
+{
+  "date": "2026-07-06",
+  "updated_at": "2026-07-16T00:53+08:00",
+  "candidate_count": 4,
+  "source_count": 4,
+  "products": [
+    {
+      "name": "佑驾创新四轮足机器人及Combo无人物流方案",
+      "slug": "youjia-innovation-quadrupedal-robot-combo",
+      "category": "消费生活",
+      "summary": "佑驾创新发布四轮足机器人及Combo全链路无人物流闭环方案，面向末端配送场景提供系统级AI物流解决方案。",
+      "official_url": "https://www.iimedia.cn/c1088/112592.html",
+      "launch_date": "2026-07-06",
+      "tags": [
+        "四轮足机器人",
+        "无人物流",
+        "具身智能",
+        "末端配送",
+        "轮足融合"
+      ],
+      "analysis": {
+        "positioning": "面向末端物流场景，提供从分拣到入户的全链路无人物流闭环方案，降低人力依赖，提升配送时效和服务标准化水平。",
+        "pain_points": [
+          "末端物流场景地形复杂（楼梯、碎石路、草地），传统轮式机器人越障能力不足",
+          "人力配送成本高、效率低，且服务标准化程度低",
+          "现有无人配送方案多为单一硬件，缺乏系统级闭环整合"
+        ],
+        "solution": [
+          "四轮足机器人采用轮足融合运动架构，兼具足式越障能力与轮式移动效率",
+          "Combo方案整合机器人、云端调度系统、智能装载单元和末端配送平台，形成完整闭环",
+          "无需人工介入即可完成全流程作业"
+        ],
+        "design": [
+          "轮足融合架构：足式越障 + 轮式高效移动",
+          "适应楼梯、碎石路、草地等多种复杂地形",
+          "系统级方案：分拣、转运、入户交付全链路自动化"
+        ],
+        "implementation": [
+          "四轮足机器人由佑驾创新旗下曜行动力打造（可验证事实）",
+          "Combo方案整合云端调度系统、智能装载单元和末端配送平台（可验证事实）",
+          "机器人采用轮足融合运动架构（可验证事实）",
+          "具备在楼梯、碎石路、草地等复杂地形稳定通行的能力（可验证事实）"
+        ],
+        "business_value": [
+          "降低末端配送人力依赖，提升配送时效",
+          "推动物流服务标准化",
+          "为佑驾创新开辟具身智能与智慧物流新赛道",
+          "与既有智能驾驶算法形成协同效应"
+        ],
+        "reflection": [
+          "从智能驾驶向具身智能延伸，体现技术复用与场景拓展",
+          "系统级方案比单一硬件更具竞争壁垒",
+          "末端物流场景需求持续释放，复合型机器人有望成为重要载体"
+        ],
+        "user_feedback": "暂无可核实反馈"
+      },
+      "score": 82,
+      "official_link_label": "查看产品发布页",
+      "id": "youjia-innovation-quadrupedal-robot-combo",
+      "sources": [
+        {
+          "title": "7月6日AI新产品讯息：佑驾创新发布四轮足机器人及无人物流方案 ...",
+          "url": "https://www.iimedia.cn/c1088/112592.html",
+          "source": ""
+        }
+      ],
+      "logo_path": ""
+    },
+    {
+      "name": "Deep Code",
+      "slug": "deep-code",
+      "category": "开发工具",
+      "summary": "开源终端AI编程助手，专为DeepSeek-V4模型适配，支持深度思考、推理强度控制及Agent Skills。",
+      "official_url": "https://deepcode.vegamo.cn/",
+      "launch_date": "2026-05-01",
+      "tags": [
+        "开源",
+        "AI编程",
+        "DeepSeek",
+        "终端CLI",
+        "VS Code插件"
+      ],
+      "analysis": {
+        "positioning": "面向开发者群体的开源AI编程助手，深度绑定DeepSeek模型生态，同时兼容OpenAI接口。",
+        "pain_points": [
+          "开发者需要频繁切换上下文，重复解释项目背景",
+          "现有AI编程工具对DeepSeek模型支持不足",
+          "缺乏连续协作能力，会话记录无法保存"
+        ],
+        "solution": [
+          "提供终端CLI和VS Code插件两种使用方式",
+          "按项目保存会话记录，支持连续协作",
+          "专为DeepSeek-V4模型优化，同时兼容OpenAI接口"
+        ],
+        "design": [
+          "基于Agent的编程助手，支持深度思考和推理强度控制",
+          "结合项目上下文保留会话记录，支持文件读取、修改和执行命令"
+        ],
+        "implementation": [
+          "v0.1.20于2026年5月发布，最新版本v0.1.31（待验证）",
+          "支持终端CLI和VS Code插件版本（来自资料）",
+          "兼容OpenAI接口的模型服务（来自资料）"
+        ],
+        "business_value": [
+          "增强DeepSeek模型生态的吸引力，促进模型采用",
+          "开源模式降低开发者使用门槛，扩大用户基础"
+        ],
+        "reflection": [
+          "深度绑定特定模型可能限制用户选择，但兼容OpenAI接口缓解了此问题",
+          "开源策略有助于社区贡献和快速迭代"
+        ],
+        "user_feedback": "暂无可核实反馈"
+      },
+      "score": 75,
+      "official_link_label": "访问产品官网",
+      "id": "deep-code",
+      "sources": [
+        {
+          "title": "Deep Code 开源 AI 编程助手上线，专为 DeepSeek-V4 模型适配",
+          "url": "https://finance.sina.com.cn/tech/digi/2026-07-06/doc-inifvqsf1838453.shtml",
+          "source": ""
+        }
+      ],
+      "logo_path": "assets/logos/deep-code.ico"
+    },
+    {
+      "name": "阿里通义Fun-ASR-Realtime实时语音识别模型",
+      "slug": "fun-asr-realtime",
+      "category": "消费生活",
+      "summary": "阿里通义升级的实时语音识别模型，支持30种语言和16种方言，低延迟流式识别。",
+      "official_url": "https://www.aihub.cn/news/",
+      "launch_date": "2026-07-06",
+      "tags": [
+        "语音识别",
+        "实时",
+        "流式",
+        "多语言",
+        "方言",
+        "阿里云"
+      ],
+      "analysis": {
+        "positioning": "面向低延迟语音转文字场景的实时语音识别模型，适用于需要边说边转写的交互场景。",
+        "pain_points": [
+          "传统语音识别延迟高，无法满足实时字幕、语音助手等场景需求",
+          "多语言和方言识别能力不足，影响全球化应用",
+          "流式处理复杂，开发集成门槛高"
+        ],
+        "solution": [
+          "支持音频流式输入和文本流式输出，实现低延迟实时识别",
+          "覆盖30种语言和16种方言，提升多语言场景适用性",
+          "基于WebSocket协议，降低集成复杂度"
+        ],
+        "design": [
+          "流式架构：音频流输入，文本流输出，支持边说边转写",
+          "多语言与方言支持：30种语言+16种方言，扩展应用范围",
+          "API集成：通过阿里云百炼平台提供API，便于开发者调用"
+        ],
+        "implementation": [
+          "基于WebSocket协议实现实时通信（资料明确提及）",
+          "API已上线阿里云百炼平台（资料明确提及）",
+          "单模型支持多语言和方言（资料明确提及）"
+        ],
+        "business_value": [
+          "降低实时语音识别应用开发门槛，加速产品落地",
+          "覆盖多语言和方言，拓展国际市场",
+          "适用于实时字幕、语音助手、会议转写等高频场景，提升用户效率"
+        ],
+        "reflection": [
+          "实时语音识别市场竞争激烈，需持续优化延迟和准确率",
+          "方言支持是差异化优势，但需验证实际识别效果",
+          "与阿里云生态深度绑定，可能影响非阿里云用户的采用"
+        ],
+        "user_feedback": "暂无可核实反馈"
+      },
+      "score": 70,
+      "official_link_label": "查看产品发布页",
+      "id": "fun-asr-realtime",
+      "sources": [
+        {
+          "title": "2026-07-06 定向补录资料",
+          "url": "https://www.aihub.cn/news/",
+          "source": "定向核验"
+        }
+      ],
+      "logo_path": ""
+    }
+  ]
+}
