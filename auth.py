@@ -99,7 +99,7 @@ def favorite_state(product_keys: list[str]) -> tuple[set[str], Counter[str]]:
     counts: Counter[str] = Counter()
     mine: set[str] = set()
     try:
-        count_rows = db.table("favorite_counts").select("product_key,favorite_count").in_("product_key", product_keys).execute().data
+        count_rows = db.rpc("get_favorite_counts", {"product_keys": product_keys}).execute().data
         counts.update({row["product_key"]: int(row["favorite_count"]) for row in count_rows})
         if is_logged_in():
             rows = db.table("favorites").select("product_key").in_("product_key", product_keys).execute().data
