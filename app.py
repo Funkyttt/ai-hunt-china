@@ -114,10 +114,11 @@ st.markdown(
 .detail-copy { color:#cbd8e5;line-height:1.8;font-size:14px; }
 .metric { padding:12px;border:1px solid rgba(143,166,188,.15);background:rgba(11,18,34,.72); }
 .metric b { display:block;color:#fff;font-size:18px; }.metric span { color:var(--muted);font-size:11px; }
+.metrics { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px; }
 .user-box { padding:10px;border:1px solid rgba(102,255,181,.22);background:rgba(102,255,181,.05); }
-.stButton>button { border-radius:2px;border:1px solid rgba(66,232,255,.32);background:rgba(66,232,255,.07);color:#dffaff;min-height:38px; }
-.stButton>button:hover { border-color:var(--cyan);color:#fff;box-shadow:0 0 20px rgba(66,232,255,.13); }
-@media(max-width:760px){.product{grid-template-columns:34px 46px minmax(0,1fr);padding:13px 10px;gap:9px}.logo{width:42px;height:42px}.score{display:none}.hero h1{font-size:36px}.block-container{padding:1rem}.product h3{font-size:16px}.product p{font-size:12px}}
+.stButton>button,[data-testid="stButton"] button { border-radius:2px!important;border:1px solid rgba(66,232,255,.32)!important;background:#0b1b2a!important;color:#dffaff!important;min-height:38px; }
+.stButton>button:hover,[data-testid="stButton"] button:hover { border-color:var(--cyan)!important;color:#fff!important;box-shadow:0 0 20px rgba(66,232,255,.13); }
+@media(max-width:760px){.product{grid-template-columns:34px 46px minmax(0,1fr);padding:13px 10px;gap:9px}.logo{width:42px;height:42px}.score{display:none}.hero h1{font-size:36px}.block-container{padding:1rem}.product h3{font-size:16px}.product p{font-size:12px}.metrics{gap:5px}.metric{padding:9px 7px}.metric b{font-size:16px}}
 </style>
 """,
     unsafe_allow_html=True,
@@ -200,13 +201,13 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-metrics = st.columns(3)
-for col, value, label in zip(
-    metrics,
-    [len(products), len(categories), data.get("source_count", 0)],
-    ["当日入选", "核心领域", "资讯来源"],
-):
-    col.markdown(f'<div class="metric"><b>{value}</b><span>{label}</span></div>', unsafe_allow_html=True)
+metric_values = [len(products), len(categories), data.get("source_count", 0)]
+metric_labels = ["当日入选", "核心领域", "资讯来源"]
+metric_html = "".join(
+    f'<div class="metric"><b>{value}</b><span>{label}</span></div>'
+    for value, label in zip(metric_values, metric_labels)
+)
+st.markdown(f'<div class="metrics">{metric_html}</div>', unsafe_allow_html=True)
 
 st.write("")
 if not filtered:
