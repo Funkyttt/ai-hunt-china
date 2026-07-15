@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
@@ -29,11 +30,11 @@ QUERIES = [
     "AI Agent 产品 发布 国内",
     "AI 设计 电商 教育 办公 产品 发布",
     "AI 视频 数字人 编程 营销 新品",
-    "AI 助手 新功能 上线",
-    "智能体 产品 正式发布",
-    "AI 应用 新品 国内 创业",
-    "AI 工具 今日 发布",
-    "AI 产品 内测 上线",
+    "国内 AI 创业 产品 发布",
+    "AI 助手 上线",
+    "智能体 产品 发布 国内",
+    "AI 应用 发布 国内",
+    "人工智能 产品 上线 中国",
 ]
 NON_OFFICIAL_HOSTS = {
     "bing.com", "baidu.com", "zhihu.com", "sohu.com", "36kr.com", "qq.com",
@@ -41,15 +42,13 @@ NON_OFFICIAL_HOSTS = {
 }
 
 
-def discover_candidates(days: int = 7) -> list[dict[str, Any]]:
+def discover_candidates(days: int = 30) -> list[dict[str, Any]]:
     now = datetime.now(TZ_CN)
     cutoff = now - timedelta(days=days)
     found: dict[str, dict[str, Any]] = {}
     for query in QUERIES:
-        dated_query = f"{query} {now.year}年{now.month}月"
         feed_urls = [
             f"https://www.bing.com/news/search?q={quote_plus(query)}&format=rss&setlang=zh-cn",
-            f"https://www.bing.com/search?q={quote_plus(dated_query)}&format=rss&setlang=zh-cn",
         ]
         for feed_url in feed_urls:
             feed = feedparser.parse(feed_url, request_headers={"User-Agent": UA})
@@ -109,7 +108,7 @@ def clean(text: str) -> str:
 
 
 def enrich_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    for item in candidates:
+    def enrich(item: dict[str, Any]) -> dict[str, Any]:
         try:
             response = requests.get(item["url"], headers={"User-Agent": UA}, timeout=10)
             response.raise_for_status()
@@ -128,8 +127,10 @@ def enrich_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
         except requests.RequestException:
             item["article_text"] = ""
             item["outbound_links"] = []
-        time.sleep(0.35)
-    return candidates
+        return item
+
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        return list(pool.map(enrich, candidates))
 
 
 class DeepSeekClient:
@@ -178,7 +179,7 @@ def choose_products(client: DeepSeekClient, candidates: list[dict[str, Any]]) ->
                 "published_at": item.get("published_at"),
                 "source": item.get("source"),
                 "summary": item.get("summary"),
-                "article_excerpt": item.get("article_text", "")[:1200],
+                "article_excerpt": item.get("article_text", "")[:3500],
                 "outbound_links": item.get("outbound_links", [])[:8],
             }
         )
