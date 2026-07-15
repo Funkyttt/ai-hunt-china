@@ -1,7 +1,7 @@
 {
-  "status": "waiting",
-  "updated_at": "",
-  "message": "等待第一次云端采集",
+  "status": "failed",
+  "updated_at": "2026-07-15T23:30:06+08:00",
+  "message": "RuntimeError: DeepSeek 未筛选出合格产品，现有榜单保持不变。",
   "product_count": 0,
   "model": "deepseek-v4-flash"
 }
