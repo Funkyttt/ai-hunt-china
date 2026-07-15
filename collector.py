@@ -52,6 +52,10 @@ VERIFIED_OFFICIAL_URLS = {
     "hy3": "https://github.com/Tencent-Hunyuan/Hy3",
     "qoder企业版": "https://qoder.com/",
     "mk-claw": "https://www.landray.com.cn/",
+    "浩辰ai设计智能体": "https://www.gstarcad.com.cn/",
+    "databridge agent": "https://help.aliyun.com/zh/dts/user-guide/what-is-databridge-agent",
+    "腾讯ai双引擎防沉迷": "https://jiazhang.qq.com/",
+    "liblib ai": "https://www.liblib.art/",
 }
 
 
@@ -288,6 +292,15 @@ def analyze_product(client: DeepSeekClient, selected: dict[str, Any]) -> dict[st
     trusted_url = VERIFIED_OFFICIAL_URLS.get(clean(product.get("name", "")).lower())
     if trusted_url:
         product["official_url"] = trusted_url
+    if product.get("official_url"):
+        product["official_link_label"] = "访问产品官网"
+    else:
+        release_url = next(
+            (item.get("url") for item in selected.get("evidence", []) if item.get("url")),
+            "",
+        )
+        product["official_url"] = release_url
+        product["official_link_label"] = "查看产品发布页"
     product["id"] = product.get("slug") or hashlib.sha1(product.get("name", "product").encode()).hexdigest()[:10]
     product["sources"] = [
         {"title": item.get("title", "原始报道"), "url": item.get("url", ""), "source": item.get("source", "")}

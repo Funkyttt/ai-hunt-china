@@ -165,7 +165,8 @@ def show_detail(product: dict) -> None:
     st.markdown(product.get("summary", ""))
     official = product.get("official_url")
     if official:
-        st.link_button("访问产品官网 ↗", official, use_container_width=True)
+        link_label = product.get("official_link_label", "访问产品官网")
+        st.link_button(f"{link_label} ↗", official, use_container_width=True)
     fields = [
         ("定位", "positioning"), ("核心痛点", "pain_points"), ("产品解法", "solution"),
         ("产品设计思路", "design"), ("产品如何实现", "implementation"),
@@ -202,6 +203,6 @@ for index, product in enumerate(filtered, start=1):
         if st.button("查看", key=f"view-{product.get('id', index)}", use_container_width=True):
             show_detail(product)
         if product.get("official_url"):
-            st.link_button("官网", product["official_url"], use_container_width=True)
+            st.link_button(product.get("official_link_label", "官网"), product["official_url"], use_container_width=True)
 
 st.caption("AI 分析用于产品研究，不替代官方说明；无法核实的信息会保留为待验证。")

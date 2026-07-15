@@ -202,7 +202,8 @@
       "slug": "haochen-ai-agent",
       "category": "AI+CAD设计工具",
       "summary": "浩辰软件发布的AI设计智能体，通过自然语言驱动实现智能生成式设计和批量编辑修改，旨在提升设计效率。",
-      "official_url": "",
+      "official_url": "https://www.gstarcad.com.cn/",
+      "official_link_label": "访问产品官网",
       "launch_date": "2026-06-16",
       "tags": [
         "AI设计",
@@ -316,7 +317,8 @@
       "slug": "yuqing-homeland-ai",
       "category": "婚恋交友",
       "summary": "为在沪河南单身青年提供AI智能匹配、咨询引导的同乡交友服务助手。",
-      "official_url": "",
+      "official_url": "https://www.sohu.com/a/1048686237_100079542",
+      "official_link_label": "查看产品发布页",
       "launch_date": "2026-07-05",
       "tags": [
         "AI匹配",
@@ -429,7 +431,8 @@
       "slug": "databridge-agent",
       "category": "AI原生数据库服务",
       "summary": "阿里云推出的AI原生数据库服务工具，通过AI技术简化数据库运维、诊断和调优流程，将于2026年8月1日商业化收费。",
-      "official_url": "",
+      "official_url": "https://help.aliyun.com/zh/dts/user-guide/what-is-databridge-agent",
+      "official_link_label": "访问产品官网",
       "launch_date": "待验证",
       "tags": [
         "AI数据库",
@@ -487,7 +490,8 @@
       "slug": "tencent-ai-dual-engine-anti-addiction",
       "category": "未成年人保护/游戏防沉迷",
       "summary": "腾讯游戏暑期升级的未成年人保护系统，通过AI双模型（混元+DeepSeek）实现对话式家长管控和游戏内动态风险识别。",
-      "official_url": "",
+      "official_url": "https://jiazhang.qq.com/",
+      "official_link_label": "访问产品官网",
       "launch_date": "2026-07-03",
       "tags": [
         "AI防沉迷",
@@ -549,7 +553,8 @@
       "slug": "liblib-ai",
       "category": "AI 素材与创作者社区",
       "summary": "中国最大的 AI 素材网站与创作者社区之一，拥有超 50 万原创模型和过亿素材，支持 AI 图片与视频生成。",
-      "official_url": "",
+      "official_url": "https://www.liblib.art/",
+      "official_link_label": "访问产品官网",
       "launch_date": "待验证",
       "tags": [
         "AI 素材",
