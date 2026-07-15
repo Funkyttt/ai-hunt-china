@@ -2,21 +2,18 @@ from __future__ import annotations
 
 from collections import Counter
 import os
+import time
 from typing import Any
 
+import requests
 import streamlit as st
-
-try:
-    from supabase import Client, create_client
-except ImportError:  # The public catalog still works before dependencies finish installing.
-    Client = Any
-    create_client = None
 
 
 PUBLIC_SUPABASE_CONFIG = {
     "SUPABASE_URL": "https://mortkrburieahfxjykte.supabase.co",
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_410RxXgZogBcWwMHpkXtCQ_tUqGPVyr",
 }
+REQUEST_TIMEOUT = 15
 
 
 def _secret(name: str) -> str:
@@ -32,58 +29,92 @@ def _api_key() -> str:
 
 
 def configured() -> bool:
-    return bool(_secret("SUPABASE_URL") and _api_key() and create_client)
+    return bool(_secret("SUPABASE_URL") and _api_key())
 
 
-def client() -> Client | None:
-    if not configured():
-        return None
-    db = create_client(_secret("SUPABASE_URL"), _api_key())
-    access_token = st.session_state.get("access_token")
-    refresh_token = st.session_state.get("refresh_token")
-    if access_token and refresh_token:
+def _headers(authenticated: bool = False) -> dict[str, str]:
+    headers = {"apikey": _api_key(), "Content-Type": "application/json"}
+    if authenticated and st.session_state.get("access_token"):
+        headers["Authorization"] = f"Bearer {st.session_state['access_token']}"
+    return headers
+
+
+def _request(method: str, path: str, *, authenticated: bool = False, **kwargs: Any) -> requests.Response:
+    headers = _headers(authenticated)
+    headers.update(kwargs.pop("headers", {}))
+    response = requests.request(
+        method,
+        f"{_secret('SUPABASE_URL')}{path}",
+        headers=headers,
+        timeout=REQUEST_TIMEOUT,
+        **kwargs,
+    )
+    if response.status_code >= 400:
         try:
-            response = db.auth.set_session(access_token, refresh_token)
-            _store_session(response.session)
-        except Exception:
-            clear_session()
-    return db
+            detail = response.json()
+        except ValueError:
+            detail = response.text
+        raise RuntimeError(detail)
+    return response
 
 
-def _store_session(session: Any) -> None:
-    if not session:
+def _store_session(payload: dict[str, Any]) -> None:
+    if not payload.get("access_token"):
         return
-    st.session_state["access_token"] = session.access_token
-    st.session_state["refresh_token"] = session.refresh_token
-    st.session_state["user_id"] = session.user.id
-    st.session_state["user_email"] = session.user.email
+    user = payload.get("user") or {}
+    st.session_state["access_token"] = payload["access_token"]
+    st.session_state["refresh_token"] = payload.get("refresh_token", "")
+    st.session_state["expires_at"] = int(payload.get("expires_at") or time.time() + payload.get("expires_in", 3600))
+    st.session_state["user_id"] = user.get("id", "")
+    st.session_state["user_email"] = user.get("email", "")
 
 
 def clear_session() -> None:
-    for key in ("access_token", "refresh_token", "user_id", "user_email"):
+    for key in ("access_token", "refresh_token", "expires_at", "user_id", "user_email"):
         st.session_state.pop(key, None)
 
 
+def _refresh_session_if_needed() -> None:
+    if not is_logged_in() or time.time() < st.session_state.get("expires_at", 0) - 60:
+        return
+    refresh_token = st.session_state.get("refresh_token")
+    if not refresh_token:
+        clear_session()
+        return
+    try:
+        response = _request(
+            "POST",
+            "/auth/v1/token?grant_type=refresh_token",
+            json={"refresh_token": refresh_token},
+        )
+        _store_session(response.json())
+    except Exception:
+        clear_session()
+
+
 def sign_in(email: str, password: str) -> tuple[bool, str]:
-    db = client()
-    if not db:
+    if not configured():
         return False, "账号服务尚未配置"
     try:
-        response = db.auth.sign_in_with_password({"email": email, "password": password})
-        _store_session(response.session)
+        response = _request(
+            "POST",
+            "/auth/v1/token?grant_type=password",
+            json={"email": email, "password": password},
+        )
+        _store_session(response.json())
         return True, "登录成功"
     except Exception as exc:
         return False, friendly_error(exc)
 
 
 def sign_up(email: str, password: str) -> tuple[bool, str]:
-    db = client()
-    if not db:
+    if not configured():
         return False, "账号服务尚未配置"
     try:
-        response = db.auth.sign_up({"email": email, "password": password})
-        if response.session:
-            _store_session(response.session)
+        response = _request("POST", "/auth/v1/signup", json={"email": email, "password": password})
+        payload = response.json()
+        if payload.get("access_token"):
+            _store_session(payload)
             return True, "注册成功"
         return True, "注册成功，请到邮箱完成验证后登录"
     except Exception as exc:
@@ -91,31 +122,39 @@ def sign_up(email: str, password: str) -> tuple[bool, str]:
 
 
 def sign_out() -> None:
-    db = client()
-    if db:
+    if is_logged_in():
         try:
-            db.auth.sign_out()
+            _request("POST", "/auth/v1/logout", authenticated=True)
         except Exception:
             pass
     clear_session()
 
 
 def is_logged_in() -> bool:
-    return bool(st.session_state.get("user_id"))
+    return bool(st.session_state.get("user_id") and st.session_state.get("access_token"))
 
 
 def favorite_state(product_keys: list[str]) -> tuple[set[str], Counter[str]]:
-    db = client()
-    if not db or not product_keys:
+    if not configured() or not product_keys:
         return set(), Counter()
     counts: Counter[str] = Counter()
     mine: set[str] = set()
     try:
-        count_rows = db.rpc("get_favorite_counts", {"product_keys": product_keys}).execute().data
-        counts.update({row["product_key"]: int(row["favorite_count"]) for row in count_rows})
+        response = _request(
+            "POST",
+            "/rest/v1/rpc/get_favorite_counts",
+            json={"product_keys": product_keys},
+        )
+        counts.update({row["product_key"]: int(row["favorite_count"]) for row in response.json()})
         if is_logged_in():
-            rows = db.table("favorites").select("product_key").in_("product_key", product_keys).execute().data
-            mine = {row["product_key"] for row in rows}
+            _refresh_session_if_needed()
+            response = _request(
+                "GET",
+                "/rest/v1/favorites",
+                authenticated=True,
+                params={"select": "product_key", "product_key": f"in.({','.join(product_keys)})"},
+            )
+            mine = {row["product_key"] for row in response.json()}
     except Exception:
         return mine, counts
     return mine, counts
@@ -124,20 +163,31 @@ def favorite_state(product_keys: list[str]) -> tuple[set[str], Counter[str]]:
 def set_favorite(product_key: str, product_date: str, active: bool) -> tuple[bool, str]:
     if not is_logged_in():
         return False, "请先登录后收藏"
-    db = client()
-    if not db:
+    if not configured():
         return False, "收藏服务尚未配置"
+    _refresh_session_if_needed()
+    if not is_logged_in():
+        return False, "登录已过期，请重新登录"
     try:
         if active:
-            db.table("favorites").upsert(
-                {
+            _request(
+                "POST",
+                "/rest/v1/favorites?on_conflict=user_id,product_key",
+                authenticated=True,
+                headers={**_headers(True), "Prefer": "resolution=merge-duplicates,return=minimal"},
+                json={
                     "user_id": st.session_state["user_id"],
                     "product_key": product_key,
                     "product_date": product_date,
-                }
-            ).execute()
+                },
+            )
         else:
-            db.table("favorites").delete().eq("product_key", product_key).execute()
+            _request(
+                "DELETE",
+                "/rest/v1/favorites",
+                authenticated=True,
+                params={"product_key": f"eq.{product_key}"},
+            )
         return True, "已收藏" if active else "已取消收藏"
     except Exception as exc:
         return False, friendly_error(exc)
@@ -147,9 +197,9 @@ def friendly_error(exc: Exception) -> str:
     message = str(exc).lower()
     if "invalid login" in message or "invalid credentials" in message:
         return "邮箱或密码不正确"
-    if "already registered" in message or "already been registered" in message:
+    if "already registered" in message or "already been registered" in message or "user already registered" in message:
         return "该邮箱已经注册"
-    if "password" in message and "characters" in message:
+    if "password" in message and ("characters" in message or "weak" in message):
         return "密码至少需要 6 位"
     if "email" in message and "confirm" in message:
         return "请先完成邮箱验证"
