@@ -164,19 +164,43 @@ class DeepSeekClient:
 
 
 def choose_products(client: DeepSeekClient, candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    compact = [
-        {k: item.get(k) for k in ("title", "url", "published_at", "source", "summary", "article_text", "outbound_links")}
-        for item in candidates
-    ]
+    compact = []
+    for index, item in enumerate(candidates):
+        compact.append(
+            {
+                "index": index,
+                "title": item.get("title"),
+                "url": item.get("url"),
+                "published_at": item.get("published_at"),
+                "source": item.get("source"),
+                "summary": item.get("summary"),
+                "article_excerpt": item.get("article_text", "")[:1200],
+                "outbound_links": item.get("outbound_links", [])[:8],
+            }
+        )
     system = """你是中国 AI 产品研究主编。只筛选具体场景中的可使用产品或明确功能更新，排除基础模型、泛行业新闻、融资新闻和纯概念。严格依据证据，不得编造产品名、发布日期或官网。输出合法 JSON。"""
-    user = f"""今天是 {datetime.now(TZ_CN).date()}。从候选资料中选出最多10个近期发布、具体、有趣且具产品研究价值的中国AI产品。
+    user = f"""今天是 {datetime.now(TZ_CN).date()}。从候选资料中选出5至10个近期发布、具体、有趣且具产品研究价值的中国AI产品；如果确有不足可以少于5个，但不要因为资料不完美而全部放弃。
 按新鲜度30%、讨论热度25%、产品创新25%、场景明确度20%打0-100分。相同产品去重。
+candidate_indexes 必须直接复制候选资料中的 index，至少包含一个编号。
 输出格式：{{"products":[{{"name":"","category":"","score":0,"candidate_indexes":[0],"reason":""}}]}}。
 候选资料：{json.dumps(compact, ensure_ascii=False)}"""
     selected = client.json(system, user, max_tokens=3500).get("products", [])
     result = []
     for product in selected[:10]:
-        indexes = [i for i in product.get("candidate_indexes", []) if isinstance(i, int) and 0 <= i < len(candidates)]
+        indexes = []
+        for value in product.get("candidate_indexes", []):
+            try:
+                index = int(value)
+            except (TypeError, ValueError):
+                continue
+            if 0 <= index < len(candidates):
+                indexes.append(index)
+        if not indexes and product.get("name"):
+            name = clean(product["name"]).lower()
+            indexes = [
+                index for index, candidate in enumerate(candidates)
+                if name in candidate.get("title", "").lower()
+            ][:2]
         if not indexes:
             continue
         product["evidence"] = [candidates[i] for i in indexes[:4]]
