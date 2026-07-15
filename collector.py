@@ -11,7 +11,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs, quote_plus, urlparse
+from urllib.parse import parse_qs, quote_plus, urljoin, urlparse
 
 import feedparser
 import requests
@@ -21,6 +21,8 @@ from dateutil import parser as date_parser
 
 ROOT = Path(__file__).parent
 DATA_FILE = ROOT / "data" / "products.json"
+HISTORY_DIR = ROOT / "data" / "history"
+LOGO_DIR = ROOT / "assets" / "logos"
 STATUS_FILE = ROOT / "data" / "update_status.json"
 TZ_CN = timezone(timedelta(hours=8))
 UA = "AIHuntChina/1.0 (+product-research; respectful single-pass crawler)"
@@ -61,15 +63,25 @@ VERIFIED_OFFICIAL_URLS = {
     "浩辰ai识图": "https://www.gstarcad.com/",
     "gstarrender": "https://www.gstarcad.com/ai/render/",
 }
+COARSE_CATEGORIES = {
+    "企业服务": ("企业", "营销", "销售", "客服", "财务", "法务", "agent", "智能体", "自动化", "客户体验"),
+    "创作设计": ("设计", "图片", "视频", "音频", "音乐", "数字人", "渲染", "cad", "创作"),
+    "开发工具": ("编程", "代码", "开发", "数据库", "运维", "安全", "api", "coding"),
+    "效率办公": ("办公", "文档", "会议", "助手", "协同", "招聘", "人力", "知识"),
+    "行业应用": ("金融", "医疗", "教育", "工业", "制造", "农业", "政务", "建筑", "电商"),
+    "消费生活": ("婚恋", "交友", "社交", "游戏", "旅行", "健身", "家庭", "个人"),
+}
 
 
-def discover_candidates(days: int = 30) -> list[dict[str, Any]]:
+def discover_candidates(days: int = 30, target_date: datetime | None = None) -> list[dict[str, Any]]:
     now = datetime.now(TZ_CN)
     cutoff = now - timedelta(days=days)
+    target_day = target_date.date() if target_date else None
     found: dict[str, dict[str, Any]] = {}
     for query in QUERIES:
+        dated_query = f"{query} {target_day.isoformat()}" if target_day else query
         feed_urls = [
-            f"https://www.bing.com/news/search?q={quote_plus(query)}&format=rss&setlang=zh-cn",
+            f"https://www.bing.com/news/search?q={quote_plus(dated_query)}&format=rss&setlang=zh-cn",
         ]
         for feed_url in feed_urls:
             feed = feedparser.parse(feed_url, request_headers={"User-Agent": UA})
@@ -78,7 +90,9 @@ def discover_candidates(days: int = 30) -> list[dict[str, Any]]:
                 if not url:
                     continue
                 published = parse_date(entry.get("published", ""))
-                if published and published < cutoff:
+                if target_day and published and published.date() != target_day:
+                    continue
+                if not target_day and published and published < cutoff:
                     continue
                 key = canonical_key(url, entry.get("title", ""))
                 found[key] = {
@@ -87,12 +101,12 @@ def discover_candidates(days: int = 30) -> list[dict[str, Any]]:
                     "published_at": published.isoformat() if published else "",
                     "source": clean(entry.get("source", {}).get("title", "") if isinstance(entry.get("source"), dict) else ""),
                     "summary": clean(BeautifulSoup(entry.get("summary", ""), "html.parser").get_text(" "))[:500],
-                    "query": query,
+                    "query": dated_query,
                 }
         time.sleep(0.5)
     candidates = list(found.values())
     candidates.sort(key=lambda x: x.get("published_at", ""), reverse=True)
-    return enrich_candidates(candidates[:45])
+    return enrich_candidates(candidates[:80])
 
 
 def unwrap_url(url: str) -> str:
@@ -189,7 +203,11 @@ class DeepSeekClient:
         raise RuntimeError(f"DeepSeek 调用失败：{last_error}")
 
 
-def choose_products(client: DeepSeekClient, candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def choose_products(
+    client: DeepSeekClient,
+    candidates: list[dict[str, Any]],
+    target_date: datetime | None = None,
+) -> list[dict[str, Any]]:
     compact = []
     for index, item in enumerate(candidates):
         compact.append(
@@ -205,27 +223,26 @@ def choose_products(client: DeepSeekClient, candidates: list[dict[str, Any]]) ->
             }
         )
     system = """你是中国 AI 产品研究主编。只筛选具体场景中的可使用产品或明确功能更新，排除基础模型、泛行业新闻、融资新闻和纯概念。严格依据证据，不得编造产品名、发布日期或官网。输出合法 JSON。"""
-    user = f"""今天是 {datetime.now(TZ_CN).date()}。从候选资料中选出5至10个近期发布、具体、有趣且具产品研究价值的中国AI产品；如果确有不足可以少于5个，但不要因为资料不完美而全部放弃。
+    editorial_date = target_date.date() if target_date else datetime.now(TZ_CN).date()
+    user = f"""榜单日期是 {editorial_date}。从候选资料中找出全部符合标准的中国AI产品，不设数量上限，也不要为了凑数加入不合格产品。
+入榜标准：必须是具体可使用产品或明确产品功能更新；有中国团队或主要面向中国市场；有可追溯证据；综合评分不低于60分。排除基础模型、融资、战略、纯概念和重复产品。
 按新鲜度30%、讨论热度25%、产品创新25%、场景明确度20%打0-100分。相同产品去重。
 candidate_indexes 必须直接复制候选资料中的 index，至少包含一个编号。
 输出格式：{{"products":[{{"name":"","category":"","score":0,"candidate_indexes":[0],"reason":""}}]}}。
 候选资料：{json.dumps(compact, ensure_ascii=False)}"""
-    selected = client.json(system, user, max_tokens=3500).get("products", [])
-    if len(selected) < 10:
-        supplement_system = """你是AI产品情报编辑。请从证据中提取具体产品，不要把公司、模型、行业或战略当作产品。一篇报道可拆出多个独立产品。输出合法JSON，不得编造证据编号。"""
-        supplement_user = f"""从下面候选资料中补充提取具体的中国AI产品或明确的产品功能更新，目标是凑满10个不同产品动态。
-已有产品名：{json.dumps([item.get('name') for item in selected], ensure_ascii=False)}
-每个产品必须给出证据编号 candidate_indexes。输出格式：{{"products":[{{"name":"","category":"","score":0,"candidate_indexes":[0],"reason":""}}]}}。
-候选资料：{json.dumps(compact, ensure_ascii=False)}"""
-        supplements = client.json(supplement_system, supplement_user, max_tokens=4000).get("products", [])
-        merged: dict[str, dict[str, Any]] = {}
-        for item in selected + supplements:
-            name = clean(str(item.get("name", ""))).lower()
-            if name and name not in merged:
-                merged[name] = item
-        selected = list(merged.values())[:10]
+    selected = client.json(system, user, max_tokens=6000).get("products", [])
+    merged: dict[str, dict[str, Any]] = {}
+    for item in selected:
+        name = clean(str(item.get("name", ""))).lower()
+        try:
+            score = int(item.get("score", 0))
+        except (TypeError, ValueError):
+            score = 0
+        if name and score >= 60 and name not in merged:
+            merged[name] = item
+    selected = sorted(merged.values(), key=lambda item: int(item.get("score", 0)), reverse=True)
     result = []
-    for product in selected[:10]:
+    for product in selected:
         indexes = []
         for value in product.get("candidate_indexes", []):
             try:
@@ -246,15 +263,11 @@ candidate_indexes 必须直接复制候选资料中的 index，至少包含一�
             score = int(product.get("score", 0))
         except (TypeError, ValueError):
             score = 0
-        if score <= 0:
-            # Supplemental selections are already ranked; preserve that order when
-            # the model omits a numeric score instead of showing a misleading zero.
-            score = max(60, 78 - len(result) * 2)
         product["score"] = max(0, min(100, score))
         product["evidence"] = [candidates[i] for i in indexes[:4]]
         result.append(product)
-    if len(result) < 10:
-        raise RuntimeError(f"仅筛选出 {len(result)} 个有证据的具体产品，未达到每日10个的发布标准。")
+    if not result:
+        raise RuntimeError("没有筛选出符合60分门槛且证据完整的具体产品。")
     return result
 
 
@@ -272,6 +285,78 @@ def official_search_results(product_name: str) -> list[dict[str, str]]:
             continue
         results.append({"title": clean(entry.get("title", "")), "url": url})
     return results[:5]
+
+
+def coarse_category(product: dict[str, Any]) -> str:
+    text = " ".join(
+        [
+            str(product.get("name", "")),
+            str(product.get("category", "")),
+            str(product.get("summary", "")),
+            " ".join(str(tag) for tag in product.get("tags", [])),
+        ]
+    ).lower()
+    strong_vertical = COARSE_CATEGORIES["行业应用"]
+    if any(keyword in text for keyword in strong_vertical):
+        return "行业应用"
+    strong_consumer = COARSE_CATEGORIES["消费生活"]
+    if any(keyword in text for keyword in strong_consumer):
+        return "消费生活"
+    scores = {
+        category: sum(text.count(keyword) for keyword in keywords)
+        for category, keywords in COARSE_CATEGORIES.items()
+    }
+    best = max(scores, key=scores.get)
+    return best if scores[best] else "消费生活"
+
+
+def cache_product_logo(product: dict[str, Any]) -> str:
+    page_url = product.get("official_url", "")
+    if not page_url or product.get("official_link_label") != "访问产品官网":
+        return ""
+    try:
+        response = requests.get(page_url, headers={"User-Agent": UA}, timeout=12)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, "html.parser")
+        candidates: list[str] = []
+        for selector, attribute in (
+            ('meta[property="og:image"]', "content"),
+            ('meta[name="twitter:image"]', "content"),
+            ('link[rel~="apple-touch-icon"]', "href"),
+            ('link[rel~="icon"]', "href"),
+        ):
+            node = soup.select_one(selector)
+            if node and node.get(attribute):
+                candidates.append(urljoin(page_url, node.get(attribute)))
+        candidates.append(urljoin(page_url, "/favicon.ico"))
+        for candidate in candidates:
+            try:
+                image_response = requests.get(candidate, headers={"User-Agent": UA}, timeout=12)
+                image_response.raise_for_status()
+                content_type = image_response.headers.get("Content-Type", "").split(";")[0].lower()
+                if not content_type.startswith("image/") or len(image_response.content) > 3_000_000:
+                    continue
+                extension = {
+                    "image/png": ".png",
+                    "image/jpeg": ".jpg",
+                    "image/webp": ".webp",
+                    "image/svg+xml": ".svg",
+                    "image/x-icon": ".ico",
+                    "image/vnd.microsoft.icon": ".ico",
+                }.get(content_type, Path(urlparse(candidate).path).suffix.lower())
+                if extension not in {".png", ".jpg", ".jpeg", ".webp", ".svg", ".ico"}:
+                    extension = ".png"
+                LOGO_DIR.mkdir(parents=True, exist_ok=True)
+                for old_logo in LOGO_DIR.glob(f"{product['id']}.*"):
+                    old_logo.unlink()
+                logo_path = LOGO_DIR / f"{product['id']}{extension}"
+                logo_path.write_bytes(image_response.content)
+                return logo_path.relative_to(ROOT).as_posix()
+            except requests.RequestException:
+                continue
+    except requests.RequestException:
+        return ""
+    return ""
 
 
 def analyze_product(client: DeepSeekClient, selected: dict[str, Any]) -> dict[str, Any]:
@@ -306,41 +391,70 @@ def analyze_product(client: DeepSeekClient, selected: dict[str, Any]) -> dict[st
         product["official_url"] = release_url
         product["official_link_label"] = "查看产品发布页"
     product["id"] = product.get("slug") or hashlib.sha1(product.get("name", "product").encode()).hexdigest()[:10]
+    product["category"] = coarse_category(product)
     product["sources"] = [
         {"title": item.get("title", "原始报道"), "url": item.get("url", ""), "source": item.get("source", "")}
         for item in selected.get("evidence", [])
     ]
+    product["logo_path"] = cache_product_logo(product)
     return product
 
 
-def run_pipeline(dry_run: bool = False) -> dict[str, Any]:
+def run_pipeline(dry_run: bool = False, target_date: datetime | None = None) -> dict[str, Any]:
     client = None if dry_run else DeepSeekClient()
-    candidates = discover_candidates()
+    candidates = discover_candidates(target_date=target_date)
     if dry_run:
         print(json.dumps(candidates[:5], ensure_ascii=False, indent=2))
         return {"candidate_count": len(candidates)}
     if not candidates:
         raise RuntimeError("没有采集到候选信息，现有榜单保持不变。")
     assert client is not None
-    selected = choose_products(client, candidates)
+    selected = choose_products(client, candidates, target_date=target_date)
     if not selected:
         raise RuntimeError("DeepSeek 未筛选出合格产品，现有榜单保持不变。")
     products = []
     for item in selected:
         products.append(analyze_product(client, item))
     now = datetime.now(TZ_CN)
+    editorial_date = target_date.date() if target_date else now.date()
     payload = {
-        "date": now.date().isoformat(),
+        "date": editorial_date.isoformat(),
         "updated_at": now.isoformat(timespec="minutes"),
         "candidate_count": len(candidates),
         "source_count": len({urlparse(c["url"]).netloc for c in candidates}),
         "products": products,
     }
-    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    temp = DATA_FILE.with_suffix(".tmp")
+    HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+    history_file = HISTORY_DIR / f"{editorial_date.isoformat()}.json"
+    temp = history_file.with_suffix(".tmp")
     temp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    temp.replace(DATA_FILE)
+    temp.replace(history_file)
+    if not target_date or editorial_date >= datetime.now(TZ_CN).date():
+        DATA_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     return payload
+
+
+def refresh_existing_logos() -> int:
+    files = sorted(HISTORY_DIR.glob("*.json")) if HISTORY_DIR.exists() else []
+    if DATA_FILE.exists() and DATA_FILE not in files:
+        files.append(DATA_FILE)
+    updated = 0
+    for data_file in files:
+        payload = json.loads(data_file.read_text(encoding="utf-8"))
+        changed = False
+        for product in payload.get("products", []):
+            category = coarse_category(product)
+            if product.get("category") != category:
+                product["category"] = category
+                changed = True
+            logo_path = cache_product_logo(product)
+            if logo_path and product.get("logo_path") != logo_path:
+                product["logo_path"] = logo_path
+                changed = True
+        if changed:
+            data_file.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            updated += 1
+    return updated
 
 
 def write_status(status: str, message: str, product_count: int = 0) -> None:
@@ -362,9 +476,16 @@ if __name__ == "__main__":
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="只测试公开资讯采集，不调用 DeepSeek")
+    parser.add_argument("--date", help="生成指定日期榜单，格式 YYYY-MM-DD")
+    parser.add_argument("--refresh-logos", action="store_true", help="为现有榜单刷新官网 Logo")
     args = parser.parse_args()
     try:
-        result = run_pipeline(dry_run=args.dry_run)
+        if args.refresh_logos:
+            updated_files = refresh_existing_logos()
+            print(f"Logo 刷新完成：更新 {updated_files} 个数据文件。")
+            raise SystemExit(0)
+        target = datetime.strptime(args.date, "%Y-%m-%d").replace(tzinfo=TZ_CN) if args.date else None
+        result = run_pipeline(dry_run=args.dry_run, target_date=target)
         product_count = len(result.get("products", []))
         if not args.dry_run:
             write_status("success", "每日采集与分析完成", product_count)
