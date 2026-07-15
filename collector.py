@@ -20,6 +20,7 @@ from dateutil import parser as date_parser
 
 ROOT = Path(__file__).parent
 DATA_FILE = ROOT / "data" / "products.json"
+STATUS_FILE = ROOT / "data" / "update_status.json"
 TZ_CN = timezone(timedelta(hours=8))
 UA = "AIHuntChina/1.0 (+product-research; respectful single-pass crawler)"
 QUERIES = [
@@ -237,11 +238,32 @@ def run_pipeline(dry_run: bool = False) -> dict[str, Any]:
     return payload
 
 
+def write_status(status: str, message: str, product_count: int = 0) -> None:
+    api_key = os.getenv("DEEPSEEK_API_KEY", "")
+    safe_message = (message or "").replace(api_key, "[REDACTED]") if api_key else (message or "")
+    payload = {
+        "status": status,
+        "updated_at": datetime.now(TZ_CN).isoformat(timespec="seconds"),
+        "message": safe_message[:1200],
+        "product_count": product_count,
+        "model": os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash"),
+    }
+    STATUS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    STATUS_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 if __name__ == "__main__":
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="只测试公开资讯采集，不调用 DeepSeek")
     args = parser.parse_args()
-    result = run_pipeline(dry_run=args.dry_run)
-    print(f"完成：{result.get('candidate_count', 0)} 条候选，{len(result.get('products', []))} 个产品。")
+    try:
+        result = run_pipeline(dry_run=args.dry_run)
+        product_count = len(result.get("products", []))
+        if not args.dry_run:
+            write_status("success", "每日采集与分析完成", product_count)
+        print(f"完成：{result.get('candidate_count', 0)} 条候选，{product_count} 个产品。")
+    except Exception as exc:
+        write_status("failed", f"{type(exc).__name__}: {exc}")
+        raise
