@@ -1,0 +1,323 @@
+{
+  "date": "2026-07-01",
+  "updated_at": "2026-07-16T00:45+08:00",
+  "candidate_count": 3,
+  "source_count": 2,
+  "products": [
+    {
+      "name": "文心一言",
+      "slug": "wenxin-yiyan",
+      "category": "效率办公",
+      "summary": "百度旗下全能AI助手，支持对话、文档处理、图表生成等，面向C端办公与学习场景。",
+      "official_url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+      "launch_date": "待验证",
+      "tags": [
+        "AI助手",
+        "办公",
+        "学习",
+        "百度",
+        "大模型"
+      ],
+      "analysis": {
+        "positioning": "百度旗下C端AI助手，定位为AI搜索与办公助手入口，通过大模型能力提升用户办公与学习效率。",
+        "pain_points": [
+          "用户处理长篇文档（如行业报告、PDF）时提取核心信息耗时费力",
+          "传统聊天机器人无法生成结构化图表，数据可视化需手动操作"
+        ],
+        "solution": [
+          "深度阅读：上传百页以上文档，AI数秒内提取核心论点并生成结构化脑图",
+          "图表生成：通过自然语言指令直接生成可视化表格与柱状图"
+        ],
+        "design": [
+          "功能更新聚焦C端办公与学习场景，降低用户操作门槛",
+          "深度阅读与图表生成能力直接集成在App内，无需切换工具"
+        ],
+        "implementation": [
+          "基于百度文心大模型，支持长文档理解与多轮对话（合理推测）",
+          "2026年7月1日上线深度阅读与图表生成功能（可验证事实）"
+        ],
+        "business_value": [
+          "巩固百度在C端AI搜索与办公助手市场的地位",
+          "拉开与普通聊天机器人的体验差距，提升用户粘性",
+          "为百度AI业务贡献用户流量与潜在付费转化"
+        ],
+        "reflection": [
+          "功能更新紧跟办公与学习场景痛点，但需持续迭代以应对竞品",
+          "图表生成能力可能受限于数据格式与复杂指令理解"
+        ],
+        "user_feedback": "暂无可核实反馈"
+      },
+      "score": 85,
+      "official_link_label": "查看产品发布页",
+      "id": "wenxin-yiyan",
+      "sources": [
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+          "source": ""
+        },
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/jjxw/2026-07-05/doc-inifuhww8881811.shtml",
+          "source": ""
+        }
+      ],
+      "logo_path": ""
+    },
+    {
+      "name": "大员",
+      "slug": "dayuan",
+      "category": "企业服务",
+      "summary": "腾讯企业微信推出的AI智能体，基于DeepSeek大模型，左滑唤起，智能识别页面并响应。",
+      "official_url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+      "launch_date": "2026-07-02",
+      "tags": [
+        "企业微信",
+        "AI智能体",
+        "DeepSeek",
+        "企业协作",
+        "腾讯"
+      ],
+      "analysis": {
+        "positioning": "企业微信内的AI助手，提升协作效率，降低操作门槛。",
+        "pain_points": [
+          "企业微信功能繁多，用户查找和操作效率低",
+          "跨页面、跨应用协作时信息割裂",
+          "传统搜索和菜单导航无法理解用户意图"
+        ],
+        "solution": [
+          "左滑唤起，降低使用门槛",
+          "智能识别当前页面上下文，自动理解用户请求",
+          "基于DeepSeek大模型提供精准响应"
+        ],
+        "design": [
+          "左滑手势唤起，符合移动端操作习惯",
+          "页面感知能力，无需用户手动指定上下文",
+          "自然语言交互，支持复杂指令"
+        ],
+        "implementation": [
+          "基于DeepSeek最新大语言模型构建（可验证事实）",
+          "腾讯首次在核心企业协作产品中接入第三方大模型（可验证事实）",
+          "依托企业微信用户基础和数据进行优化（合理推测）"
+        ],
+        "business_value": [
+          "提升企业微信用户粘性和使用时长",
+          "为腾讯探索第三方大模型集成提供标杆案例",
+          "推动DeepSeek在B端场景的规模化落地"
+        ],
+        "reflection": [
+          "左滑唤起的设计简洁但可能误触",
+          "页面感知能力依赖企业微信生态，通用性受限",
+          "第三方模型依赖可能带来数据安全和合规挑战"
+        ],
+        "user_feedback": "暂无可核实反馈"
+      },
+      "score": 82,
+      "official_link_label": "查看产品发布页",
+      "id": "dayuan",
+      "sources": [
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+          "source": ""
+        },
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/jjxw/2026-07-05/doc-inifuhww8881811.shtml",
+          "source": ""
+        }
+      ],
+      "logo_path": ""
+    },
+    {
+      "name": "科大讯飞AI学习机T90",
+      "slug": "iflytek-t90",
+      "category": "行业应用",
+      "summary": "搭载星火教育大模型，主打AI个性化精准学，通过启发式引导和错因诊断系统替代传统刷题模式。",
+      "official_url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+      "launch_date": "2026-07-02",
+      "tags": [
+        "AI学习机",
+        "个性化学习",
+        "星火大模型",
+        "教育硬件",
+        "科大讯飞"
+      ],
+      "analysis": {
+        "positioning": "面向K12学生，以AI个性化精准学为核心卖点，旨在替代传统报班刷题，提供学情诊断与个性化干预的学习机。",
+        "pain_points": [
+          "传统报班刷题效率低、针对性差",
+          "学生缺乏个性化学习路径",
+          "家长难以准确诊断孩子学习薄弱点"
+        ],
+        "solution": [
+          "搭载星火教育大模型，提供AI答疑辅导（审题追问、提示推导、板书讲解）",
+          "小初数学新增全程导学功能，动态规划每日学习路径",
+          "联合北师大研发错因诊断系统，分析概念理解、方法迁移等认知卡点"
+        ],
+        "design": [
+          "硬件形态为学习机，屏幕尺寸和护眼技术待验证",
+          "软件界面强调学情可视化与个性化推荐",
+          "AI交互采用启发式引导而非直接给答案"
+        ],
+        "implementation": [
+          "基于星火教育大模型（合理推测）",
+          "错因诊断系统由北师大联合研发（可验证事实）",
+          "全程导学功能覆盖小初数学（可验证事实）"
+        ],
+        "business_value": [
+          "切入暑期教育市场，缓解家长报班焦虑",
+          "推动教育AI从题库堆砌转向学情诊断与干预",
+          "巩固科大讯飞在教育AI领域的领先地位"
+        ],
+        "reflection": [
+          "产品理念符合教育减负趋势，但实际效果依赖模型准确性和数据积累",
+          "启发式引导可能增加学习时间，需平衡效率与深度",
+          "错因诊断系统若有效，可成为差异化优势"
+        ],
+        "user_feedback": "暂无可核实反馈"
+      },
+      "score": 80,
+      "official_link_label": "查看产品发布页",
+      "id": "iflytek-t90",
+      "sources": [
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+          "source": ""
+        },
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/jjxw/2026-07-05/doc-inifuhww8881811.shtml",
+          "source": ""
+        }
+      ],
+      "logo_path": ""
+    },
+    {
+      "name": "学而思T6系列学习机",
+      "slug": "xueersi-t6",
+      "category": "行业应用",
+      "summary": "好未来旗下学而思旗舰学习机，含标准版/国际版/Max，首发价6899-11999元，主打AI双师互动与护眼屏。",
+      "official_url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+      "launch_date": "2026-06-30",
+      "tags": [
+        "AI学习机",
+        "教育硬件",
+        "个性化学习",
+        "护眼技术"
+      ],
+      "analysis": {
+        "positioning": "高端AI教育硬件，面向高净值家庭，以AI诊断+双师互动替代传统报班刷题。",
+        "pain_points": [
+          "家长暑期焦虑，依赖报班刷题提升成绩",
+          "传统学习机内容同质化，缺乏个性化诊断",
+          "长时间使用电子屏幕影响视力"
+        ],
+        "solution": [
+          "培优AI家教：AI诊断规划+AI双师互动课堂",
+          "APEX自然光护眼技术，联合TCL华星定制屏幕",
+          "多版本覆盖不同需求（标准/国际/Max）"
+        ],
+        "design": [
+          "全系屏幕与TCL华星联合定制，搭载APEX自然光护眼技术",
+          "AI双师互动课堂模式，融合诊断与教学",
+          "三个版本差异化定价，覆盖不同预算"
+        ],
+        "implementation": [
+          "2026年6月30日举办点映会正式发布（可验证）",
+          "首发价6899/8699/11999元（可验证）",
+          "搭载学而思自研AI模型，具体技术细节未披露（待验证）"
+        ],
+        "business_value": [
+          "冲击高端教育硬件市场，争夺高净值家庭支出份额",
+          "通过AI硬件提升品牌溢价，拓展好未来营收结构",
+          "与科大讯飞T90、网易有道X90形成差异化竞争"
+        ],
+        "reflection": [
+          "高端定价需匹配显著效果，否则可能面临性价比质疑",
+          "AI双师模式对师资和模型要求高，落地效果待观察",
+          "护眼技术是差异化亮点，但需长期验证有效性"
+        ],
+        "user_feedback": "暂无可核实反馈"
+      },
+      "score": 78,
+      "official_link_label": "查看产品发布页",
+      "id": "xueersi-t6",
+      "sources": [
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+          "source": ""
+        },
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/jjxw/2026-07-05/doc-inifuhww8881811.shtml",
+          "source": ""
+        }
+      ],
+      "logo_path": ""
+    },
+    {
+      "name": "网易有道AI学习机X90",
+      "slug": "youdao-x90",
+      "category": "行业应用",
+      "summary": "搭载子曰大模型，支持AI作文批改、口语陪练及个性化学习路径规划，主打AI重构学习流程。",
+      "official_url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+      "launch_date": "2026-07-01",
+      "tags": [
+        "AI学习机",
+        "子曰大模型",
+        "个性化学习",
+        "教育硬件"
+      ],
+      "analysis": {
+        "positioning": "面向K-12学生，以AI个性化精准学为核心，区别于传统硬件堆料，强调AI重构学习流程。",
+        "pain_points": [
+          "学生暑期报班刷题焦虑，学习效率低",
+          "传统学习机缺乏个性化诊断，无法精准定位薄弱点",
+          "家长难以辅导作文、口语等主观题"
+        ],
+        "solution": [
+          "搭载自研子曰教育大模型，提供AI作文批改（逻辑结构到修辞润色）",
+          "口语1对1陪练，模拟真实对话场景",
+          "个性化学习路径规划，根据学情动态调整"
+        ],
+        "design": [
+          "硬件与AI深度融合，而非单纯堆料",
+          "AI诊断学情并给出提分策略，提升用户粘性"
+        ],
+        "implementation": [
+          "基于子曰大模型实现自然语言理解与生成（可验证事实）",
+          "上市首周销量超出预期（来自CEO周枫公开表态，可验证事实）",
+          "推测：AI作文批改可能采用多轮对话式反馈，而非一次性评分"
+        ],
+        "business_value": [
+          "验证AI重构学习流程的商业逻辑，区别于竞品硬件堆料",
+          "暑期热销带动营收增长，巩固网易有道在教育AI硬件市场的地位"
+        ],
+        "reflection": [
+          "教育AI竞争已从题库堆砌转向学情诊断与个性化干预",
+          "用户更关注AI能否真正提分，而非硬件参数"
+        ],
+        "user_feedback": "暂无可核实反馈"
+      },
+      "score": 76,
+      "official_link_label": "查看产品发布页",
+      "id": "youdao-x90",
+      "sources": [
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/stock/t/2026-07-05/doc-inifuhwt9248889.shtml",
+          "source": ""
+        },
+        {
+          "title": "AI应用周度观察（2026年6月27日—7月3日）",
+          "url": "https://finance.sina.com.cn/jjxw/2026-07-05/doc-inifuhww8881811.shtml",
+          "source": ""
+        }
+      ],
+      "logo_path": ""
+    }
+  ]
+}
