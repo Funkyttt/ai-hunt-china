@@ -1,7 +1,7 @@
 {
-  "status": "failed",
-  "updated_at": "2026-07-15T23:37:17+08:00",
-  "message": "RuntimeError: 仅筛选出 1 个有证据的具体产品，未达到每日10个的发布标准。",
-  "product_count": 0,
+  "status": "success",
+  "updated_at": "2026-07-15T23:49:07+08:00",
+  "message": "每日采集与分析完成",
+  "product_count": 10,
   "model": "deepseek-v4-flash"
 }
