@@ -71,6 +71,34 @@ COARSE_CATEGORIES = {
     "行业应用": ("金融", "医疗", "教育", "工业", "制造", "农业", "政务", "建筑", "电商"),
     "消费生活": ("婚恋", "交友", "社交", "游戏", "旅行", "健身", "家庭", "个人"),
 }
+HISTORICAL_SEED_URLS = {
+    "2026-07-06": [
+        "https://www.geoaurora.cn/reports/2026-07-06-daily.html",
+        "https://www.aihub.cn/news/",
+    ],
+    "2026-07-08": [
+        "https://jishuzhan.net/article/2075087248879529985",
+    ],
+    "2026-07-10": [
+        "https://www.izhuapp.com/index.php/2026/07/10/%E7%A7%91%E6%8A%80%E7%AE%80%E6%8A%A5%E7%AC%94%E8%AE%B02026-07-10t143443-5680800/",
+    ],
+    "2026-07-12": [
+        "https://www.feifeixu.me/ai-daily-report",
+    ],
+    "2026-07-13": [
+        "https://finance.sina.com.cn/stock/t/2026-07-13/doc-inihsist7377446.shtml",
+        "https://view.inews.qq.com/a/20260713A07OEU00",
+    ],
+    "2026-07-14": [
+        "https://zglg.work/ai/today/2026-07-14",
+        "https://swil-news.vercel.app/news/ai-tech/2026-07-14",
+    ],
+    "2026-07-15": [
+        "https://aifrontbrief.com/",
+        "https://radarai.top/updates",
+        "https://companies.caixin.com/2026-07-04/102460931.html",
+    ],
+}
 
 
 def discover_candidates(days: int = 30, target_date: datetime | None = None) -> list[dict[str, Any]]:
@@ -110,6 +138,20 @@ def discover_candidates(days: int = 30, target_date: datetime | None = None) -> 
                 }
         time.sleep(0.5)
     candidates = list(found.values())
+    if target_day:
+        for url in HISTORICAL_SEED_URLS.get(target_day.isoformat(), []):
+            key = canonical_key(url, url)
+            if key not in found:
+                candidates.append(
+                    {
+                        "title": f"{target_day.isoformat()} 定向补录资料",
+                        "url": url,
+                        "published_at": target_date.isoformat() if target_date else "",
+                        "source": "定向核验",
+                        "summary": "",
+                        "query": "历史定向补录",
+                    }
+                )
     candidates.sort(key=lambda x: x.get("published_at", ""), reverse=True)
     return enrich_candidates(candidates[:80])
 

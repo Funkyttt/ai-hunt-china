@@ -19,17 +19,9 @@ jobs:
       max-parallel: 3
       matrix:
         date:
-          - "2026-07-01"
-          - "2026-07-02"
-          - "2026-07-03"
-          - "2026-07-04"
-          - "2026-07-05"
           - "2026-07-06"
-          - "2026-07-07"
           - "2026-07-08"
-          - "2026-07-09"
           - "2026-07-10"
-          - "2026-07-11"
           - "2026-07-12"
           - "2026-07-13"
           - "2026-07-14"
@@ -52,7 +44,11 @@ jobs:
         if: always()
         run: |
           mkdir -p staging/history staging/logos
-          test -f "data/history/${{ matrix.date }}.json" && cp "data/history/${{ matrix.date }}.json" staging/history/
+          if [ -f "data/history/${{ matrix.date }}.json" ]; then
+            cp "data/history/${{ matrix.date }}.json" staging/history/
+          else
+            printf '{"date":"${{ matrix.date }}","updated_at":"","candidate_count":0,"source_count":0,"products":[],"note":"当日暂无达到入榜标准且证据完整的产品"}\n' > "staging/history/${{ matrix.date }}.json"
+          fi
           test ! -d assets/logos || cp -r assets/logos/. staging/logos/
       - uses: actions/upload-artifact@v4
         if: always()
