@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+import os
 from typing import Any
 
 import streamlit as st
@@ -12,21 +13,32 @@ except ImportError:  # The public catalog still works before dependencies finish
     create_client = None
 
 
+PUBLIC_SUPABASE_CONFIG = {
+    "SUPABASE_URL": "https://mortkrburieahfxjykte.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_410RxXgZogBcWwMHpkXtCQ_tUqGPVyr",
+}
+
+
 def _secret(name: str) -> str:
     try:
-        return str(st.secrets.get(name, "")).strip()
+        value = str(st.secrets.get(name, "")).strip()
     except Exception:
-        return ""
+        value = ""
+    return value or os.getenv(name, "").strip() or PUBLIC_SUPABASE_CONFIG.get(name, "")
+
+
+def _api_key() -> str:
+    return _secret("SUPABASE_PUBLISHABLE_KEY") or _secret("SUPABASE_ANON_KEY")
 
 
 def configured() -> bool:
-    return bool(_secret("SUPABASE_URL") and _secret("SUPABASE_ANON_KEY") and create_client)
+    return bool(_secret("SUPABASE_URL") and _api_key() and create_client)
 
 
 def client() -> Client | None:
     if not configured():
         return None
-    db = create_client(_secret("SUPABASE_URL"), _secret("SUPABASE_ANON_KEY"))
+    db = create_client(_secret("SUPABASE_URL"), _api_key())
     access_token = st.session_state.get("access_token")
     refresh_token = st.session_state.get("refresh_token")
     if access_token and refresh_token:
