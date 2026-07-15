@@ -210,9 +210,6 @@ metric_html = "".join(
 st.markdown(f'<div class="metrics">{metric_html}</div>', unsafe_allow_html=True)
 
 st.write("")
-if not filtered:
-    st.info("没有匹配的产品。")
-
 
 @st.dialog("产品深度情报", width="large")
 def show_detail(product: dict) -> None:
@@ -248,28 +245,45 @@ def show_detail(product: dict) -> None:
             st.markdown(f"- [{source.get('title', '原始报道')}]({source.get('url', '#')})")
 
 
-for index, product in enumerate(filtered, start=1):
-    key = product_key(product)
-    card, actions = st.columns([8.5, 1.5], vertical_alignment="center")
-    with card:
-        tags = "".join(f'<span class="chip">{safe(tag)}</span>' for tag in product.get("tags", [])[:4])
-        top = " top" if index <= 3 else ""
-        st.markdown(
-            f"""<div class="product"><div class="rank{top}">{index:02d}</div>{logo_html(product)}<div>
-            <h3>{safe(product.get('name', ''))}</h3><p>{safe(product.get('summary', ''))}</p><div class="chips"><span class="chip">{safe(product.get('category', ''))}</span>{tags}</div>
-            </div><div class="score"><strong>▲ {safe(product.get('score', 0))}</strong><small>signal score</small></div></div>""",
-            unsafe_allow_html=True,
-        )
-    with actions:
-        if st.button("查看", key=f"view-{selected_date}-{key}", use_container_width=True):
-            show_detail(product)
-        active = key in my_favorites
-        star_label = f"{'★' if active else '☆'} {favorite_counts.get(key, 0)}"
-        if st.button(star_label, key=f"star-{selected_date}-{key}", use_container_width=True, help="收藏产品"):
-            ok, message = auth.set_favorite(key, selected_date, not active)
-            if ok:
-                st.rerun()
-            else:
-                st.toast(message)
+previous_product_count = st.session_state.get("_rendered_product_count", 0)
+slot_count = max(len(filtered), previous_product_count)
+with st.container(key="product-results"):
+    empty_message = st.empty()
+    if not filtered:
+        empty_message.info("没有匹配的产品。")
 
-st.caption("AI 分析用于产品研究，不替代官方说明；无法核实的信息会保留为待验证。")
+    for slot_index in range(slot_count):
+        slot = st.empty()
+        if slot_index >= len(filtered):
+            slot.empty()
+            continue
+
+        product = filtered[slot_index]
+        index = slot_index + 1
+        with slot.container():
+            key = product_key(product)
+            card, actions = st.columns([8.5, 1.5], vertical_alignment="center")
+            with card:
+                tags = "".join(f'<span class="chip">{safe(tag)}</span>' for tag in product.get("tags", [])[:4])
+                top = " top" if index <= 3 else ""
+                st.markdown(
+                    f"""<div class="product"><div class="rank{top}">{index:02d}</div>{logo_html(product)}<div>
+                    <h3>{safe(product.get('name', ''))}</h3><p>{safe(product.get('summary', ''))}</p><div class="chips"><span class="chip">{safe(product.get('category', ''))}</span>{tags}</div>
+                    </div><div class="score"><strong>▲ {safe(product.get('score', 0))}</strong><small>signal score</small></div></div>""",
+                    unsafe_allow_html=True,
+                )
+            with actions:
+                if st.button("查看", key=f"view-{selected_date}-{key}", use_container_width=True):
+                    show_detail(product)
+                active = key in my_favorites
+                star_label = f"{'★' if active else '☆'} {favorite_counts.get(key, 0)}"
+                if st.button(star_label, key=f"star-{selected_date}-{key}", use_container_width=True, help="收藏产品"):
+                    ok, message = auth.set_favorite(key, selected_date, not active)
+                    if ok:
+                        st.rerun()
+                    else:
+                        st.toast(message)
+
+    st.caption("AI 分析用于产品研究，不替代官方说明；无法核实的信息会保留为待验证。")
+
+st.session_state["_rendered_product_count"] = len(filtered)
