@@ -1,0 +1,86 @@
+name: 补录 7 月历史产品
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/backfill-july.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  collect-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        date:
+          - "2026-07-01"
+          - "2026-07-02"
+          - "2026-07-03"
+          - "2026-07-04"
+          - "2026-07-05"
+          - "2026-07-06"
+          - "2026-07-07"
+          - "2026-07-08"
+          - "2026-07-09"
+          - "2026-07-10"
+          - "2026-07-11"
+          - "2026-07-12"
+          - "2026-07-13"
+          - "2026-07-14"
+          - "2026-07-15"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 生成 ${{ matrix.date }} 榜单
+        id: collect
+        continue-on-error: true
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_MODEL: deepseek-v4-flash
+        run: python collector.py --date "${{ matrix.date }}"
+      - name: 整理本日结果
+        if: always()
+        run: |
+          mkdir -p staging/history staging/logos
+          test -f "data/history/${{ matrix.date }}.json" && cp "data/history/${{ matrix.date }}.json" staging/history/
+          test ! -d assets/logos || cp -r assets/logos/. staging/logos/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: history-${{ matrix.date }}
+          path: staging
+          if-no-files-found: warn
+
+  merge-history:
+    needs: collect-history
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: history-*
+          path: collected
+          merge-multiple: true
+      - name: 合并历史榜单
+        run: |
+          mkdir -p data/history assets/logos
+          find collected/history -type f -name '*.json' -exec cp {} data/history/ \; 2>/dev/null || true
+          find collected/logos -type f -exec cp {} assets/logos/ \; 2>/dev/null || true
+          git config user.name "ai-hunt-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/history assets/logos
+          git diff --cached --quiet || git commit -m "data: backfill July AI products"
+          git push

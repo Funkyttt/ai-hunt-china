@@ -78,8 +78,13 @@ def discover_candidates(days: int = 30, target_date: datetime | None = None) -> 
     cutoff = now - timedelta(days=days)
     target_day = target_date.date() if target_date else None
     found: dict[str, dict[str, Any]] = {}
-    for query in QUERIES:
-        dated_query = f"{query} {target_day.isoformat()}" if target_day else query
+    discovery_queries = QUERIES + (["AI新产品讯息", "AI新品日报", "AI产品上线发布"] if target_day else [])
+    for query in discovery_queries:
+        if target_day:
+            date_phrase = f"{target_day.month}月{target_day.day}日"
+            dated_query = f'"{date_phrase}" {query} {target_day.year}'
+        else:
+            dated_query = query
         feed_urls = [
             f"https://www.bing.com/news/search?q={quote_plus(dated_query)}&format=rss&setlang=zh-cn",
         ]
@@ -90,7 +95,7 @@ def discover_candidates(days: int = 30, target_date: datetime | None = None) -> 
                 if not url:
                     continue
                 published = parse_date(entry.get("published", ""))
-                if target_day and published and published.date() != target_day:
+                if target_day and published and abs((published.date() - target_day).days) > 7:
                     continue
                 if not target_day and published and published < cutoff:
                     continue
@@ -225,6 +230,7 @@ def choose_products(
     system = """你是中国 AI 产品研究主编。只筛选具体场景中的可使用产品或明确功能更新，排除基础模型、泛行业新闻、融资新闻和纯概念。严格依据证据，不得编造产品名、发布日期或官网。输出合法 JSON。"""
     editorial_date = target_date.date() if target_date else datetime.now(TZ_CN).date()
     user = f"""榜单日期是 {editorial_date}。从候选资料中找出全部符合标准的中国AI产品，不设数量上限，也不要为了凑数加入不合格产品。
+历史日期规则：只有证据明确表明产品在榜单当日发布、上线或完成重要更新时才能入榜；报道可以晚于榜单日期，但不能仅因报道发布在附近日期就推断产品日期。
 入榜标准：必须是具体可使用产品或明确产品功能更新；有中国团队或主要面向中国市场；有可追溯证据；综合评分不低于60分。排除基础模型、融资、战略、纯概念和重复产品。
 按新鲜度30%、讨论热度25%、产品创新25%、场景明确度20%打0-100分。相同产品去重。
 candidate_indexes 必须直接复制候选资料中的 index，至少包含一个编号。
@@ -412,9 +418,8 @@ def run_pipeline(dry_run: bool = False, target_date: datetime | None = None) -> 
     selected = choose_products(client, candidates, target_date=target_date)
     if not selected:
         raise RuntimeError("DeepSeek 未筛选出合格产品，现有榜单保持不变。")
-    products = []
-    for item in selected:
-        products.append(analyze_product(client, item))
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        products = list(pool.map(lambda item: analyze_product(client, item), selected))
     now = datetime.now(TZ_CN)
     editorial_date = target_date.date() if target_date else now.date()
     payload = {
