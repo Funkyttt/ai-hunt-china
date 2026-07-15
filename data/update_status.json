@@ -1,7 +1,7 @@
 {
-  "status": "failed",
-  "updated_at": "2026-07-15T23:30:06+08:00",
-  "message": "RuntimeError: DeepSeek 未筛选出合格产品，现有榜单保持不变。",
-  "product_count": 0,
+  "status": "success",
+  "updated_at": "2026-07-15T23:33:47+08:00",
+  "message": "每日采集与分析完成",
+  "product_count": 1,
   "model": "deepseek-v4-flash"
 }
