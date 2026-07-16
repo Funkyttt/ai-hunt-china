@@ -164,6 +164,9 @@ with st.sidebar:
                     (st.success if ok else st.error)(message)
                     if ok and auth.is_logged_in():
                         st.rerun()
+                if st.button("重新发送验证邮件", key="resend-verification", use_container_width=True):
+                    ok, message = auth.resend_signup(register_email.strip())
+                    (st.success if ok else st.error)(message)
     else:
         st.caption("账号与收藏服务等待数据库配置")
 

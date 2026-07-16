@@ -14,6 +14,7 @@ PUBLIC_SUPABASE_CONFIG = {
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_410RxXgZogBcWwMHpkXtCQ_tUqGPVyr",
 }
 REQUEST_TIMEOUT = 15
+PUBLIC_APP_URL = "https://ai-hunt-china.streamlit.app/"
 
 
 def _secret(name: str) -> str:
@@ -111,12 +112,34 @@ def sign_up(email: str, password: str) -> tuple[bool, str]:
     if not configured():
         return False, "账号服务尚未配置"
     try:
-        response = _request("POST", "/auth/v1/signup", json={"email": email, "password": password})
+        response = _request(
+            "POST",
+            "/auth/v1/signup",
+            params={"redirect_to": PUBLIC_APP_URL},
+            json={"email": email, "password": password},
+        )
         payload = response.json()
         if payload.get("access_token"):
             _store_session(payload)
             return True, "注册成功"
         return True, "注册成功，请到邮箱完成验证后登录"
+    except Exception as exc:
+        return False, friendly_error(exc)
+
+
+def resend_signup(email: str) -> tuple[bool, str]:
+    if not configured():
+        return False, "账号服务尚未配置"
+    if not email:
+        return False, "请先填写注册邮箱"
+    try:
+        _request(
+            "POST",
+            "/auth/v1/resend",
+            params={"redirect_to": PUBLIC_APP_URL},
+            json={"type": "signup", "email": email},
+        )
+        return True, "验证邮件已重新发送，请检查收件箱和垃圾邮件"
     except Exception as exc:
         return False, friendly_error(exc)
 
@@ -203,4 +226,8 @@ def friendly_error(exc: Exception) -> str:
         return "密码至少需要 6 位"
     if "email" in message and "confirm" in message:
         return "请先完成邮箱验证"
+    if "email address not authorized" in message or "not authorized" in message:
+        return "当前邮件服务不允许向该邮箱发送，请联系管理员配置正式邮件服务"
+    if "rate limit" in message or "over_email_send_rate_limit" in message:
+        return "验证邮件发送过于频繁，请稍后再试"
     return "操作失败，请稍后重试"
