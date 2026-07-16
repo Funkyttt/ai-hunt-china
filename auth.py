@@ -14,7 +14,6 @@ PUBLIC_SUPABASE_CONFIG = {
     "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_410RxXgZogBcWwMHpkXtCQ_tUqGPVyr",
 }
 REQUEST_TIMEOUT = 15
-PUBLIC_APP_URL = "https://ai-hunt-china.streamlit.app/"
 
 
 def _secret(name: str) -> str:
@@ -112,34 +111,12 @@ def sign_up(email: str, password: str) -> tuple[bool, str]:
     if not configured():
         return False, "账号服务尚未配置"
     try:
-        response = _request(
-            "POST",
-            "/auth/v1/signup",
-            params={"redirect_to": PUBLIC_APP_URL},
-            json={"email": email, "password": password},
-        )
+        response = _request("POST", "/auth/v1/signup", json={"email": email, "password": password})
         payload = response.json()
         if payload.get("access_token"):
             _store_session(payload)
             return True, "注册成功"
-        return True, "注册成功，请到邮箱完成验证后登录"
-    except Exception as exc:
-        return False, friendly_error(exc)
-
-
-def resend_signup(email: str) -> tuple[bool, str]:
-    if not configured():
-        return False, "账号服务尚未配置"
-    if not email:
-        return False, "请先填写注册邮箱"
-    try:
-        _request(
-            "POST",
-            "/auth/v1/resend",
-            params={"redirect_to": PUBLIC_APP_URL},
-            json={"type": "signup", "email": email},
-        )
-        return True, "验证邮件已重新发送，请检查收件箱和垃圾邮件"
+        return False, "注册未完成，请更换邮箱后重试"
     except Exception as exc:
         return False, friendly_error(exc)
 
