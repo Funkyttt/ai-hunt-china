@@ -1,7 +1,7 @@
 {
-  "status": "success",
-  "updated_at": "2026-07-16T11:59:31+08:00",
-  "message": "每日采集与分析完成",
-  "product_count": 7,
+  "status": "failed",
+  "updated_at": "2026-07-17T11:58:19+08:00",
+  "message": "RuntimeError: 没有采集到候选信息，现有榜单保持不变。",
+  "product_count": 0,
   "model": "deepseek-v4-flash"
 }
