@@ -1,7 +1,7 @@
 {
   "status": "success",
-  "updated_at": "2026-08-08T10:54:42+08:00",
+  "updated_at": "2026-08-09T11:01:28+08:00",
   "message": "每日采集与分析完成",
-  "product_count": 31,
+  "product_count": 14,
   "model": "deepseek-v4-flash"
 }
