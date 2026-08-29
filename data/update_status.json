@@ -1,6 +1,6 @@
 {
   "status": "failed",
-  "updated_at": "2026-08-28T20:28:52+08:00",
+  "updated_at": "2026-08-29T15:38:44+08:00",
   "message": "RuntimeError: DeepSeek 调用失败：401 Client Error: Unauthorized for url: https://api.deepseek.com/chat/completions",
   "product_count": 0,
   "model": "deepseek-v4-flash"
